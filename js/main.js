@@ -1,21 +1,21 @@
 (function(){
-
-    console.log("Hello world!!!!");
-
+    var lifePowerupImage = new Image();
+    var healthPowerupImage = new Image();
+    var pointPowerupImage = new Image();
     window.HandleCanvasClick = HandleCanvasClick;
 
     //window.addEventListener('load', POP.init, false);
     window.addEventListener('resize', resize, false);
-    
+	
     var starting = true;
     var ended = false;
     var highscore = 0;
     var newRecord = false;
     
-    ua = navigator.userAgent.toLowerCase();
-    android = ua.indexOf('android') > -1 ? true : false;
-    ios = ( ua.indexOf('iphone') > -1 ||
-	    ua.indexOf('ipad') > -1  ) ? true : false;
+    var ua = navigator.userAgent.toLowerCase();
+    var android = ua.indexOf('android') > -1 ? true : false;
+    var ios = ( ua.indexOf('iphone') > -1 ||
+		    ua.indexOf('ipad') > -1  ) ? true : false;
 
     var currentWidth = 320;
     var currentHeight = 480;
@@ -35,7 +35,6 @@
     var touching = false;
     var damage = 2;
 
-    
     var keys = [false, false];
     canvas.setAttribute("style","background-color: #000000;");
 
@@ -54,49 +53,65 @@
     var healthPowerup = [];
     var max_healthPowerups = 2;
     var powerupVelocity = 5;
-
+    
     var score = 0;
     var health = 100;
     var lives = 3;
 
-    document.onkeydown = function() {
-    switch (window.event.keyCode) {
-        case 37:
-	keys[0] = true;
-	keys[1] = false;
-            break;
-        case 38:
-            break;
-        case 39:
-	keys[1] = true;
-	keys[0] = false;
-            break;
-        case 40:
-            break;
+    console.log("Hello world!!!!");
+    
+    lifePowerupImage.onload = function() {
+	healthPowerupImage.onload = function() {
+	    pointPowerupImage.onload = function() {
+		startGame();
+	    }
+	    pointPowerupImage.src = "point.svg";
+	}
+	healthPowerupImage.src = "healthpowerup.svg";
     }
-    };
-
-    document.onkeyup = function()
+    lifePowerupImage.src = "lifepowerup.svg";
+    
+    function startGame()
     {
-	switch (window.event.keyCode)
-	{
+	console.log("Game started!");
+	document.onkeydown = function() {
+	    switch (window.event.keyCode) {
             case 37:
-		keys[0] = false;
+		keys[0] = true;
+		keys[1] = false;
 		break;
             case 38:
 		break;
             case 39:
-		keys[1] = false;
+		keys[1] = true;
+		keys[0] = false;
 		break;
             case 40:
 		break;
-	}
-    };
-    
-    window.requestAnimFrame = (
+	    }
+	};
+
+	document.onkeyup = function()
+	{
+	    switch (window.event.keyCode)
+	    {
+		case 37:
+		keys[0] = false;
+		break;
+		case 38:
+		break;
+		case 39:
+		keys[1] = false;
+		break;
+		case 40:
+		break;
+	    }
+	};
+	console.log("I seem to be working!");
+	window.requestAnimFrame = (
 	function(callback)
 	{
-	    return window.requestAnimationFrame ||
+	    return (window.requestAnimationFrame ||
 		window.webkitRequestAnimationFrame ||
 		window.mozRequestAnimationFrame ||
 		window.oRequestAnimationFrame ||
@@ -104,8 +119,11 @@
 		function(callback)
 	        {
 		    window.setTimeout(callback, 1000 / 60);
-		};
+		});
 	})();
+	resize();
+	animate();
+    }
 
     function animate()
     {
@@ -257,16 +275,16 @@
 	    }
 	}
 	//Generate new point powerups
-	if(handlePowerup(points, "point.svg", 5, max_points))
+	if(handlePowerup(points, pointPowerupImage, 5, max_points))
 	{
 	    ++score;
 	}
-	if(handlePowerup(lifePowerup, "lifepowerup.svg", 5, max_lifePowerups))
+	if(handlePowerup(lifePowerup, lifePowerupImage, 5, max_lifePowerups))
 	{
 	    ++lives;
 	}
 
-	if(handlePowerup(healthPowerup, "healthpowerup.svg", 5, max_healthPowerups))
+	if(handlePowerup(healthPowerup, healthPowerupImage, 5, max_healthPowerups))
 	{
 	    health = 100;
 	}
@@ -356,31 +374,22 @@
 
 	    //Tell the user about the powerups
 	    //Points
-	    var imgp1 = new Image();
-	    imgp1.onload = function() {
-		context.drawImage(imgp1, 0, Math.ceil(canvas.height/2) + 105);
-	    }
-	    imgp1.src = "point.svg";
+	    context.drawImage(pointPowerupImage, 0,
+			      Math.ceil(canvas.height/2) + 105);
 	    context.fillStyle = "white";
 	    context.fillText("These give you points",
 			     10,
 			     Math.ceil(canvas.height/2) + 115);
 	    //Lives
-	    var imgp2 = new Image();
-	    imgp2.onload = function() {
-		context.drawImage(imgp2, 0, Math.ceil(canvas.height/2) + 125);
-	    }
-	    imgp2.src = "lifepowerup.svg";
+	    context.drawImage(lifePowerupImage, 0,
+			      Math.ceil(canvas.height/2) + 125);
 	    context.fillStyle = "white";
 	    context.fillText("These gives you a life",
 			     10,
 			     Math.ceil(canvas.height/2) + 135);
 	    //Health
-	    var imgp3 = new Image();
-	    imgp3.onload = function() {
-		context.drawImage(imgp3, 0, Math.ceil(canvas.height/2) + 145);
-	    }
-	    imgp3.src = "healthpowerup.svg";
+	    context.drawImage(healthPowerupImage, 0,
+			      Math.ceil(canvas.height/2) + 145);
 	    context.fillStyle = "white";
 	    context.fillText("These replenish your health",
 			     10,
@@ -448,13 +457,13 @@
 	img.src = "point.svg";*/
 
 	//Display points powerups
-	drawPowerups(points, "point.svg");
+	drawPowerups(points, pointPowerupImage);
 
 	//Display health powerups
-	drawPowerups(healthPowerup, "healthpowerup.svg");
+	drawPowerups(healthPowerup, healthPowerupImage);
 
 	//Display life powerups
-	drawPowerups(lifePowerup, "lifepowerup.svg");
+	drawPowerups(lifePowerup, lifePowerupImage);
 	
 	
 	//Display the health
@@ -478,16 +487,11 @@
 	context.fillStyle = "white";
 	context.font = "12px Arial";
 	context.fillText("Lives: ",0,35);
-	
-	var img = new Image();
-	img.src = "lifepowerup.svg";
-	img.onload = function()
+
+	for(var i = 0; i < lives; ++i)
 	{
-	    for(var i = 0; i < lives; ++i)
-	    {
-		context.drawImage(img,
-				  35 + i * img.naturalWidth, 25);
-	    }
+	    context.drawImage(lifePowerupImage,
+			      35 + i * lifePowerupImage.naturalWidth, 25);
 	}
 	
 	//Display the score
@@ -601,9 +605,7 @@
 
     function handlePowerup(parr, pimg, pperc, pmax)
     {
-	var img = new Image();
-	img.src = pimg;
-	var w = Math.ceil(img.naturalWidth);
+	var w = Math.ceil(pimg.naturalWidth);
 	if(parr.length !== pmax &&
 	   Math.floor((Math.random() * 100) + 1) < pperc)
 	{
@@ -783,15 +785,10 @@
 
     function drawPowerups(parr, pimg)
     {
-	var imgh = new Image();
-	imgh.onload = function()
+	for(var i = 0; i < parr.length; ++i)
 	{
-	    for(var i = 0; i < parr.length; ++i)
-	    {
-		context.drawImage(imgh, parr[i].x, parr[i].y);
-	    }
+	    context.drawImage(pimg, parr[i].x, parr[i].y);
 	}
-	imgh.src = pimg;
     }
 
     function HandleCanvasClick()
@@ -820,7 +817,4 @@
 	lifePowerup = [];
 	healthPowerups = [];
     }
-
-    resize();
-    animate();
 }());
