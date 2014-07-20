@@ -1,4 +1,6 @@
 (function(){
+    var level = 1;
+    var canIncrementLevel = false;
     var lifePowerupImage = new Image();
     var healthPowerupImage = new Image();
     var pointPowerupImage = new Image();
@@ -144,11 +146,26 @@
     }
 
     function updateGame()
-    {
-	//console.log("Updating!");
+    {	
 	if(starting || ended)
 	{
 	    return;
+	}
+	var maxBarsForLevel = level * 4 + 3;
+	var maxHealthForLevel = Math.ceil(5 / level);
+	var maxLivesForLevel = Math.ceil(2 / level);
+	var maxPointsForLevel = Math.ceil(7 / level);
+	if(score % 10 == 0 && canIncrementLevel)
+	{
+	    ++level;
+	    canIncrementLevel = false;
+	}
+	else
+	{
+	    if(!canIncrementLevel && score % 10 != 0)
+	    {
+		canIncrementLevel = true;
+	    }
 	}
 	
 	if(lives < 1)
@@ -160,8 +177,9 @@
 	}
 
 	//Generate new bars
-	if(bars.length !== max_bars &&
-	   Math.floor((Math.random() * 100) + 1) < 25)
+	if(bars.length !== max_bars
+	   && bars.length !== maxBarsForLevel
+	   && Math.floor((Math.random() * 100) + 1) < 25)
 	{
 	   var tx = Math.floor(
 		(Math.random() * canvas.width) + 1) - 1;
@@ -275,16 +293,19 @@
 	    }
 	}
 	//Generate new point powerups
-	if(handlePowerup(points, pointPowerupImage, 5, max_points))
+	if(handlePowerup(points, pointPowerupImage, 5, max_points,
+			maxPointsForLevel))
 	{
 	    ++score;
 	}
-	if(handlePowerup(lifePowerup, lifePowerupImage, 5, max_lifePowerups))
+	if(handlePowerup(lifePowerup, lifePowerupImage, 0.05,
+			 max_lifePowerups, maxLivesForLevel))
 	{
 	    ++lives;
 	}
 
-	if(handlePowerup(healthPowerup, healthPowerupImage, 5, max_healthPowerups))
+	if(handlePowerup(healthPowerup, healthPowerupImage, 0.08,
+			 max_healthPowerups, maxHealthForLevel))
 	{
 	    health = 100;
 	}
@@ -435,26 +456,13 @@
 			     canvas.height - 40);
 	    return;
 	}
-
+	//Actual in-game drawing, now.
 	for(var i = 0; i < bars.length; ++i)
 	{
 	    drawLine(bars[i]);
 	}
 	
 	drawTriangle();
-
-	/*if(touching)
-	{
-	    context.fillStyle = "white";
-	    context.font = "30px Arial";
-	    context.fillText("Touching!",10,50);
-	}*/
-
-	/*var img = new Image();
-	img.onload = function() {
-	    context.drawImage(img, 0, 0);
-	}
-	img.src = "point.svg";*/
 
 	//Display points powerups
 	drawPowerups(points, pointPowerupImage);
@@ -498,6 +506,11 @@
 	context.fillStyle = "white";
 	context.font = "12px Arial";
 	context.fillText("Score: " + score,0,50);
+
+	//Display the current level
+	context.fillStyle = "white";
+	context.font = "12px Arial";
+	context.fillText("Level: " + level,0,70);
     }
 
     function drawTriangle()
@@ -603,11 +616,12 @@
         }, 1);
     }
 
-    function handlePowerup(parr, pimg, pperc, pmax)
+    function handlePowerup(parr, pimg, pperc, pmax, lmax)
     {
 	var w = Math.ceil(pimg.naturalWidth);
-	if(parr.length !== pmax &&
-	   Math.floor((Math.random() * 100) + 1) < pperc)
+	if(parr.length !== pmax
+	   && parr.length !== lmax
+	   && (Math.random() * 100) < pperc)
 	{
 	    
 	    var tx = Math.floor(
