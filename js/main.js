@@ -76,8 +76,9 @@
     function startGame()
     {
 	console.log("Game started!");
-	document.onkeydown = function() {
-	    switch (window.event.keyCode) {
+	document.onkeydown = function(e) {
+	    var ev = e ? e : window.event;
+	    switch (ev.keyCode) {
             case 37:
 		keys[0] = true;
 		keys[1] = false;
@@ -93,9 +94,10 @@
 	    }
 	};
 
-	document.onkeyup = function()
+	document.onkeyup = function(e)
 	{
-	    switch (window.event.keyCode)
+	    var ev = e? e: window.event;
+	    switch (ev.keyCode)
 	    {
 		case 37:
 		keys[0] = false;
