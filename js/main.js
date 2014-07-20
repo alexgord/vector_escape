@@ -146,7 +146,7 @@
     }
 
     function updateGame()
-    {	
+    {
 	if(starting || ended)
 	{
 	    return;
@@ -205,7 +205,7 @@
 	//Move bars
 	for(var i = 0; i < bars.length; ++i)
 	{
-	    bars[i].y += barVelocity;
+	    bars[i].y += barVelocity + level - 1;
 	    if(bars[i].y > canvas.height)//Remove bars that have left the screen
 	    {
 		bars.splice(i, 1);
