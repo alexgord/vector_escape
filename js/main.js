@@ -823,6 +823,7 @@
 
     function ReInitGame()
     {
+	level = 0;
 	score = 0;
 	lives = 3;
 	health = 100;
